@@ -1,12 +1,39 @@
 <html>
 	<head>
-		
+		<style type="text/css">
+			
+			ul{
+				list-style: none;
+			}
+
+			.edit {
+				display: none;
+			}
+
+			.editing .view {
+				display: none;
+			}
+
+			.editing .edit {
+				display: block;
+			}
+
+		</style>
 	</head>
 	<body>
-	<div id="todoapp">
-		<input type="text" id="new-todo">
-	</div>
-				
+		<div id="todoapp">
+			<input type="text" id="new-todo">
+		</div>
+		<ul id="todo-list">
+			
+		</ul>
 	</body>
+	<script type="text/template" id="todo-template">
+		<div class="view">
+		  <label><%- name %></label>
+		</div>
+		<input class="edit" type="text" value="<%- name %>" />
+		<p class="delete">DELETE</p>
+	</script>
 	<script src="prod/js/production.js"></script>
 </html>

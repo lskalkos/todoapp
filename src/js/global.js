@@ -4,11 +4,10 @@ var _ = require('underscore');
 Backbone.$ = $;
 Backbone.LocalStorage = require("backbone.localstorage");
 
+
 (function($){
 
 	var Todo = Backbone.Model.extend({});
-
-	var todo = new Todo({ name: "Drink coffee", completed: false });
 
 	var TodoList = Backbone.Collection.extend({
 
@@ -20,30 +19,50 @@ Backbone.LocalStorage = require("backbone.localstorage");
 
 	var ListView = Backbone.View.extend({
 
-		template: _.template("<%= name %>"),
+		tagName: "li",
+
+		template: _.template($('#todo-template').html()),
 		
 		initialize: function() {
 			this.render();
+			this.listenTo(this.model, 'change', this.render);
+			this.listenTo(this.model, 'destroy', this.remove);
 		},
 
 		render: function() {
 			this.$el.html(this.template(this.model.toJSON()));
-			$('body').append(this.$el);
+			$("#todo-list").append(this.$el);
 			return this;
-		} 
+		}, 
 
-		// events: {
-		// 	"blur .edit" : "close"
-		// },
+		events: {
+			"click .delete" : "delete",
+			"dblclick .view" : "edit",
+			"blur .edit" : "close",
+			"keypress .edit"  : "updateOnEnter",
+		},
 
-		// close: function() {
-		// 	var value = this.input.val();
-		// 	// var todo = new Todo({ name: value });
-		// 	this.model.save({name: value});
-		// }
+		delete: function() {
+			this.model.destroy();
+		}, 
+
+		edit: function() {
+			this.$el.addClass("editing");
+      		this.$(".edit").focus();
+		},
+
+		close: function() {
+			var value = this.$(".edit").val();
+			this.model.save({name: value});
+        	this.$el.removeClass("editing");
+		},
+
+		updateOnEnter: function(e) {
+			if (e.keyCode == 13) {
+				this.close();
+			}
+		}
 	});
-
-	var list = new ListView({model: todo}); 
 
 	var AppView = Backbone.View.extend({
 
@@ -65,6 +84,7 @@ Backbone.LocalStorage = require("backbone.localstorage");
 		createonEnter: function(e) {
 			if (e.keyCode != 13) return;
 			todos.create({name: this.$('#new-todo').val()});
+
 			this.$('#new-todo').val('');
 		}
 	})
